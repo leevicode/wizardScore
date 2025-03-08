@@ -190,7 +190,7 @@ update msg model =
                                     (\_ guesses tricks ->
                                         case compare guesses tricks of
                                             EQ ->
-                                                updateTotal score <| 20 * tricks
+                                                updateTotal score <| 20 + 10 * tricks
 
                                             _ ->
                                                 updateTotal score <| -10 * (abs <| tricks - guesses)
