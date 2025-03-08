@@ -1,0 +1,2 @@
+# wizardScore
+Wizard scorekeeper
