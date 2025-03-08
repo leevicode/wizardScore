@@ -97,11 +97,11 @@ update msg model =
 
         ChangePlayerGuesses key guessMaybe ->
             model
-                |> updatePlayers key (\score -> { score | guesses = guessMaybe })
+                |> updatePlayers key (\score -> { score | guesses = guessMaybe |> M.andThen checkPositive })
 
         ChangePlayerTricks key tricksMaybe ->
             model
-                |> updatePlayers key (\score -> { score | tricks = tricksMaybe })
+                |> updatePlayers key (\score -> { score | tricks = tricksMaybe |> M.andThen checkPositive })
 
         {-
                ChangePlayerGuesses key guessMaybe ->
@@ -226,7 +226,8 @@ updatePlayers key f model =
         | players =
             model.players
                 |> Dict.update key (M.map f)
-        , errors = Nothing
+
+        --, errors = Nothing
     }
 
 

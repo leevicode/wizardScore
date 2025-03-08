@@ -1,0 +1,60 @@
+
+/* Inline #1 | file:///home/leevi/ws/wizardScore/index.html */
+
+.players {
+  width: fit-content;
+  padding: 1em;
+  padding-bottom: 0.1em;
+  background-color: #112233;
+}
+
+
+.player {
+  border: thin solid white;
+  background: cadetblue;
+  padding: 0.5em;
+  margin-bottom: 1em;
+  background-color: #010101;
+}
+
+
+h3 {
+  width: fit-content;
+}
+
+h1 {
+  width: fit-content;
+}
+
+
+.roundText {
+  width: fit-content;
+}
+
+
+body div {
+  width: fit-content;
+}
+
+
+html {
+  color: white;
+  background: black;
+}
+
+
+input {
+  color: white;
+  background-color: black;
+}
+
+button {
+  color: white;
+  background-color: black;
+}
+
+.error {
+  color: red;
+  font-size: x-large;
+}
+
