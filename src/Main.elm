@@ -2,6 +2,7 @@ module Main exposing (..)
 
 import Browser
 import Dict exposing (..)
+import Enter exposing (onEnter)
 import Html exposing (Attribute, Html, div, input, p, text)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
@@ -95,25 +96,34 @@ update msg model =
             }
 
         ChangePlayerGuesses key guessMaybe ->
-            guessMaybe
-                |> M.andThen checkPositive
-                |> M.map
-                    (\guesses ->
-                        model
-                            |> updatePlayers key (\score -> { score | guesses = Just guesses })
-                    )
-                |> M.withDefault model
+            model
+                |> updatePlayers key (\score -> { score | guesses = guessMaybe })
 
-        ChangePlayerTricks key trickMaybe ->
-            trickMaybe
-                |> M.andThen checkPositive
-                |> M.map
-                    (\tricks ->
-                        model
-                            |> updatePlayers key (\score -> { score | tricks = Just tricks })
-                    )
-                |> M.withDefault model
+        ChangePlayerTricks key tricksMaybe ->
+            model
+                |> updatePlayers key (\score -> { score | tricks = tricksMaybe })
 
+        {-
+               ChangePlayerGuesses key guessMaybe ->
+                   guessMaybe
+                   |> M.andThen checkPositive
+                   |> M.map
+                       (\guesses ->
+                           model
+                               |> updatePlayers key (\score -> { score | guesses = Just guesses })
+                       )
+                   |> M.withDefault model
+
+           ChangePlayerTricks key trickMaybe ->
+               trickMaybe
+                   |> M.andThen checkPositive
+                   |> M.map
+                       (\tricks ->
+                           model
+                               |> updatePlayers key (\score -> { score | tricks = Just tricks })
+                       )
+                   |> M.withDefault model
+        -}
         NextRound ->
             let
                 getTotal f =
@@ -233,24 +243,24 @@ view model =
             |> Dict.toList
             |> List.sortBy (\( a, b ) -> b.total * -1)
             |> List.map (\( a, b ) -> renderPlayer a b)
-            |> Html.div []
-        , textElem p [] <| "current round: " ++ String.fromInt model.round
+            |> Html.div [ class "players" ]
+        , textElem p [ class "roundText" ] <| "current round: " ++ String.fromInt model.round
 
         --, textElem Html.button [ onClick NextRound ] "next round"
         , Dict.keys model.players
             |> List.head
             |> maybeElem (\_ -> textElem Html.button [ onClick NextRound ] "Next round")
         , textElem Html.h3 [] "Add players"
-        , Html.input [ type_ "text", onInput ChangeNewPlayer, value model.playerInput, placeholder "Player name" ] []
+        , Html.input [ type_ "text", onInput ChangeNewPlayer, value model.playerInput, placeholder "Player name", onEnter NewPlayer ] []
         , textElem Html.button [ onClick NewPlayer ] "Add player"
         ]
 
 
 renderPlayer : String -> Score -> Html Msg
 renderPlayer key score =
-    Html.div []
-        [ textElem p [] key
-        , textElem p [] <| "Total score: " ++ String.fromInt score.total
+    Html.div [ class "player" ]
+        [ textElem p [ class "playerName" ] key
+        , textElem p [ class "playerScore" ] <| "Total score: " ++ String.fromInt score.total
         , inputElem "guess amount of tricks" key score.guesses ChangePlayerGuesses
         , inputElem "input actual amount " key score.tricks ChangePlayerTricks
         ]
@@ -263,7 +273,7 @@ renderError err =
             Html.text ""
 
         Just e ->
-            textElem Html.p [] e
+            textElem Html.p [ class "error" ] e
 
 
 inputElem : String -> String -> Maybe Int -> (String -> Maybe Int -> Msg) -> Html Msg
