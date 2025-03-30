@@ -48,8 +48,6 @@ initScore =
 init : Model
 init =
     { round = 1
-
-    --, players = Dict.singleton "Leevi" <| { initScore | total = 10 }
     , players = Dict.empty
     , playerInput = ""
     , errors = Nothing
@@ -80,9 +78,7 @@ update msg model =
 
                         _ ->
                             { model
-                                | players =
-                                    model.players
-                                        |> Dict.insert model.playerInput initScore
+                                | players = Dict.insert model.playerInput initScore model.players
                                 , playerInput = ""
                                 , errors = Nothing
                             }
@@ -91,9 +87,7 @@ update msg model =
                     { model | errors = Just <| "Player " ++ model.playerInput ++ " already exists!" }
 
         ChangeNewPlayer name ->
-            { model
-                | playerInput = name
-            }
+            { model | playerInput = name }
 
         ChangePlayerGuesses key guessMaybe ->
             model
@@ -103,38 +97,17 @@ update msg model =
             model
                 |> updatePlayers key (\score -> { score | tricks = tricksMaybe |> M.andThen checkPositive })
 
-        {-
-               ChangePlayerGuesses key guessMaybe ->
-                   guessMaybe
-                   |> M.andThen checkPositive
-                   |> M.map
-                       (\guesses ->
-                           model
-                               |> updatePlayers key (\score -> { score | guesses = Just guesses })
-                       )
-                   |> M.withDefault model
-
-           ChangePlayerTricks key trickMaybe ->
-               trickMaybe
-                   |> M.andThen checkPositive
-                   |> M.map
-                       (\tricks ->
-                           model
-                               |> updatePlayers key (\score -> { score | tricks = Just tricks })
-                       )
-                   |> M.withDefault model
-        -}
         NextRound ->
             let
                 getTotal f =
-                    model.players
-                        |> Dict.foldl
-                            (\_ score maybeTotal ->
-                                f score
-                                    |> M.andThen checkPositive
-                                    |> M.map2 (+) maybeTotal
-                            )
-                            (Just 0)
+                    Dict.foldl
+                        (\_ score maybeTotal ->
+                            f score
+                                |> M.andThen checkPositive
+                                |> M.map2 (+) maybeTotal
+                        )
+                        (Just 0)
+                        model.players
 
                 totalGuesses =
                     getTotal .guesses
@@ -172,34 +145,34 @@ update msg model =
                             model.round
 
                 validRound =
-                    case errors of
-                        Nothing ->
-                            Just ()
-
-                        Just _ ->
-                            Nothing
+                    errors == M.Nothing
             in
             { model
                 | errors = errors
                 , round = newRound
                 , players =
-                    model.players
-                        |> Dict.map
-                            (\_ score ->
-                                M.map3
-                                    (\_ guesses tricks ->
-                                        case compare guesses tricks of
-                                            EQ ->
-                                                updateTotal score <| 20 + 10 * tricks
+                    if validRound then
+                        model.players
+                            |> Dict.map
+                                (\_ score ->
+                                    M.map2
+                                        (\guesses tricks ->
+                                            case compare guesses tricks of
+                                                EQ ->
+                                                    updateTotal score (20 + 10 * tricks)
 
-                                            _ ->
-                                                updateTotal score <| -10 * (abs <| tricks - guesses)
-                                    )
-                                    validRound
-                                    score.guesses
-                                    score.tricks
-                                    |> M.withDefault score
-                            )
+                                                _ ->
+                                                    abs (tricks - guesses)
+                                                        |> (\x -> -10 * x)
+                                                        |> updateTotal score
+                                        )
+                                        score.guesses
+                                        score.tricks
+                                        |> M.withDefault score
+                                )
+
+                    else
+                        model.players
             }
 
 

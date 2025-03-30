@@ -1,5 +1,11 @@
+body {
+			font-size: 2vmin;
+		}
+				body, body * {
+			max-width: 100%;
+			font-size: 2vmax;
+		}
 
-/* Inline #1 | file:///home/leevi/ws/wizardScore/index.html */
 
 .players {
   width: fit-content;
@@ -10,31 +16,18 @@
 
 
 .player {
-  border: thin solid white;
+  border-style: solid;
+  border-width: 20%;
+  border-color: white;
   background: cadetblue;
   padding: 0.5em;
   margin-bottom: 1em;
+  margin-top:0.01em;
   background-color: #010101;
 }
 
 
-h3 {
-  width: fit-content;
-}
 
-h1 {
-  width: fit-content;
-}
-
-
-.roundText {
-  width: fit-content;
-}
-
-
-body div {
-  width: fit-content;
-}
 
 
 html {
