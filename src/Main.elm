@@ -240,23 +240,32 @@ view model =
     div []
         [ textElem Html.h1 [] "Wizard score keeper"
         , renderError model.errors
-        , Html.form [ onSubmit NextRound ]
-            [ model.players
-                |> Dict.toList
-                |> List.sortBy (\( a, b ) -> b.total * -1)
-                |> List.map (\( a, b ) -> renderPlayer a b)
-                |> Html.div [ class "players" ]
-            , textElem p [ class "roundText" ] <| "current round: " ++ String.fromInt model.round
-            , Dict.keys model.players
-                |> List.head
-                |> maybeElem (\_ -> textElem Html.input [ type_ "submit", value "Next round" ] "")
-            ]
+        , textElem p [ class "roundText" ] <| "current round: " ++ String.fromInt model.round
+        , renderplayers model.players
 
         --, textElem Html.button [ onClick NextRound ] "next round"
         , textElem Html.h3 [] "Add players"
         , Html.input [ type_ "text", onInput ChangeNewPlayer, value model.playerInput, placeholder "Player name", onEnter NewPlayer ] []
         , textElem Html.button [ onClick NewPlayer ] "Add player"
         ]
+
+
+renderplayers : Dict String Score -> Html Msg
+renderplayers players =
+    if Dict.isEmpty players then
+        Html.text ""
+
+    else
+        Html.form [ onSubmit NextRound ]
+            [ players
+                |> Dict.toList
+                |> List.sortBy (\( a, b ) -> b.total * -1)
+                |> List.map (\( a, b ) -> renderPlayer a b)
+                |> Html.div [ class "players" ]
+            , Dict.keys players
+                |> List.head
+                |> maybeElem (\_ -> textElem Html.input [ type_ "submit", value "Next round" ] "")
+            ]
 
 
 renderPlayer : String -> Score -> Html Msg
