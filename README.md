@@ -1,5 +1,7 @@
 # wizardScore
 Wizard scorekeeper
+[Live version](https://leevicode.github.io/wizardScore)
+
 
 ## prerequisites
 you will need elm compiler >= 0.19.1
